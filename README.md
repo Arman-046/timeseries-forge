@@ -41,6 +41,31 @@ evaluation → deployment.
 
 ## Why this design
 
+## Demo output
+
+Synthetic multivariate sensor data with injected, labeled anomalies (red dots):
+
+
+
+![synthetic data](assets/synthetic_data.png)
+
+
+
+Training curves (train vs. validation loss) over a short demo run:
+
+
+
+![training curves](assets/training_curves.png)
+
+
+
+Final-layer self-attention, averaged over heads — one of the interpretability
+artifacts available from every forward pass:
+
+
+
+![attention heatmap](assets/attention_heatmap.png)
+
 | Component | What it is | Why it's here |
 |---|---|---|
 | **Variable Selection Network** | Per-timestep, learned softmax weighting over input channels | Gives a built-in, inspectable "which sensor mattered" signal instead of a black box |

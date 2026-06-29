@@ -172,7 +172,8 @@ class Trainer:
                 self.global_step += 1
 
             for k in agg:
-                agg[k] += float(losses[k])
+                value = losses[k]
+                value = float(value.detach()) if torch.is_tensor(value) else float(value)
             n_batches += 1
 
             if (i + 1) % cfg.log_every_n_steps == 0:
@@ -182,7 +183,7 @@ class Trainer:
                     epoch,
                     i + 1,
                     len(loader),
-                    float(losses["total"]),
+                    float(losses["total"].detach()),
                     elapsed,
                 )
 
@@ -196,6 +197,7 @@ class Trainer:
         for batch in loader:
             losses = self._run_batch(batch, training=False)
             for k in agg:
-                agg[k] += float(losses[k])
+                value = losses[k]
+                agg[k] += float(value.detach()) if torch.is_tensor(value) else float(value)
             n_batches += 1
         return {k: v / max(1, n_batches) for k, v in agg.items()}

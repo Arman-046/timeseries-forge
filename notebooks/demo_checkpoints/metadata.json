@@ -1,0 +1,16 @@
+{
+  "epoch": 8,
+  "metrics": {
+    "train": {
+      "total": 0.0,
+      "forecast_loss": 0.0,
+      "reconstruction_loss": 0.0
+    },
+    "val": {
+      "total": 0.23673429898917675,
+      "forecast_loss": 0.22987802885472775,
+      "reconstruction_loss": 0.10364381456747651
+    }
+  },
+  "is_best_so_far": true
+}
