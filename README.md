@@ -13,32 +13,20 @@ This is a from-scratch PyTorch implementation (no `transformers`
 library, no off-the-shelf forecasting model import) covering the full
 lifecycle: custom architecture → training pipeline → rigorous
 evaluation → deployment.
+```mermaid
+flowchart TD
+    A["<b>Variable Selection Network</b><br/>learns per-timestep feature importance"]
+    B["<b>Learned Positional Encoding</b><br/>+ N × [Interpretable Multi-Head Attention<br/>+ Gated Residual Network feedforward]"]
+    C["shared encoded representation<br/>(B, T, d_model)"]
+    D["<b>Attention Pooling</b><br/>→ Quantile Forecast Head<br/>(non-crossing quantiles)<br/><br/>forecast: (B, H, targets, Q)"]
+    E["<b>Reconstruction Decoder</b><br/>→ per-timestep anomaly score<br/><br/>reconstruction: (B, T, F)"]
 
+    Input(["raw input (B, T, F)"]) --> A
+    A --> B
+    B --> C
+    C --> D
+    C --> E
 ```
-            ┌─────────────────────────────────────────────┐
- raw input  │  Variable Selection Network                  │
- (B,T,F) ──▶│  (learns per-timestep feature importance)    │
-            └───────────────────┬───────────────────────────┘
-                                 ▼
-            ┌─────────────────────────────────────────────┐
-            │  Learned Positional Encoding                  │
-            │  + N × [Interpretable Multi-Head Attention     │
-            │         + Gated Residual Network feedforward]  │
-            └───────────────────┬───────────────────────────┘
-                                 ▼
-                    shared encoded representation
-                         (B, T, d_model)
-                      ╱                        ╲
-                     ▼                          ▼
-        ┌───────────────────────┐   ┌─────────────────────────┐
-        │ Attention pooling      │   │ Reconstruction decoder    │
-        │ → Quantile Forecast    │   │ → per-timestep             │
-        │   Head (non-crossing   │   │   anomaly score             │
-        │   quantiles)           │   │                              │
-        └───────────────────────┘   └─────────────────────────┘
-          forecast: (B,H,targets,Q)      reconstruction: (B,T,F)
-```
-
 ## Why this design
 
 ## Demo output
@@ -238,6 +226,34 @@ docker compose -f docker/docker-compose.yml up --build
 - **Swap the anomaly protocol**: `evaluation/anomaly_metrics.py` is
   decoupled from the model, so you can score any anomaly detector's
   output array against the same labeled synthetic benchmark.
+
+## Current scope vs. production readiness
+
+This repo demonstrates the engineering a real deployment needs —
+training pipeline, evaluation rigor, export, serving — but it has not
+been run against production traffic or production-scale data. Being
+direct about that gap, rather than hiding it:
+
+**What's in place:** AMP/grad-accumulation training, walk-forward
+evaluation, TorchScript/ONNX export, a working FastAPI server, Docker
+packaging, and a CI suite that actually passes (50/50 tests).
+
+**What a real deployment would still need, not yet implemented here:**
+- Authentication / rate limiting on the inference API (currently open)
+- Structured monitoring and alerting on serving latency, error rate,
+  and prediction-distribution drift (not just the offline eval report)
+- A real CI/CD pipeline that builds, tests, and deploys the Docker
+  image automatically rather than just running `pytest` on push
+- Validation against an actual production-scale dataset and traffic
+  pattern, rather than the synthetic generator / single public dataset
+  shipped here
+- A retraining/versioning strategy for when the underlying data
+  distribution shifts (the model has no concept of this on its own)
+
+Treat this repo as the reference implementation of the ML engineering
+layer — the part that's reusable across almost any forecasting/anomaly
+problem — with the operational layer above it left as the next step
+for a specific deployment target.
 
 ## References
 
