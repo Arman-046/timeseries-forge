@@ -1,0 +1,40 @@
+# Example experiment configuration.
+#
+# scripts/train.py currently reads CLI args directly; this file
+# documents a sensible default configuration and can be wired into
+# argparse via a --config flag (e.g. using `yaml.safe_load` +
+# `parser.set_defaults(**cfg)`) if you prefer config-file-driven runs
+# over long CLI invocations.
+
+data:
+  n_channels: 6
+  n_steps: 8760          # 1 year of hourly data if no --data-path given
+  seq_len: 168           # 1 week of hourly context
+  horizon: 24            # forecast 1 day ahead
+  target_indices: [0, 1]
+
+model:
+  d_model: 128
+  n_heads: 4
+  n_layers: 3
+  ffn_hidden: 256
+  dropout: 0.1
+  quantiles: [0.1, 0.5, 0.9]
+  causal: true
+
+training:
+  epochs: 50
+  batch_size: 64
+  lr: 0.0003
+  weight_decay: 0.01
+  warmup_ratio: 0.05
+  grad_clip_norm: 1.0
+  grad_accum_steps: 1
+  use_amp: true
+  early_stopping_patience: 10
+  seed: 42
+
+paths:
+  checkpoint_dir: checkpoints
+  log_dir: runs
+  output_dir: artifacts

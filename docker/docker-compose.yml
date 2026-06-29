@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  forge-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - FORGE_SEQ_LEN=168
+      - FORGE_NUM_FEATURES=6
+    volumes:
+      - ../artifacts:/app/artifacts:ro
+    restart: unless-stopped

@@ -1,0 +1,5 @@
+Place README images here (e.g. an exported architecture diagram or
+training-curve screenshot from notebooks/demo.ipynb) and reference
+them from README.md with standard Markdown image syntax:
+
+    ![architecture](assets/architecture.png)
